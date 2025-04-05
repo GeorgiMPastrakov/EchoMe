@@ -13,4 +13,13 @@ class UserResponse(BaseModel):
     username: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+class VoiceResponse(BaseModel):
+    id: int
+    voice_name: str
+    audio_file: str
+    embedding_file: str
+
+    class Config:
+        from_attributes = True
