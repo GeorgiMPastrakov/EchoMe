@@ -77,5 +77,10 @@ def generate_audio(voice_id: int, text: str, db: Session = Depends(get_db)):
     
     return FileResponse(output_file, media_type="audio/wav")
 
+@app.get("/voices")
+def get_voices(user_id: int, db: Session = Depends(get_db)):
+    voices = db.query(models.Voice).filter(models.Voice.user_id == user_id).all()
+    return [schemas.VoiceResponse.from_orm(v) for v in voices]
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
