@@ -7,6 +7,14 @@ import soundfile as sf
 
 API_URL = "http://localhost:8000"
 
+
+st.set_page_config(
+    page_title="EchoMe",
+    page_icon="🎤",
+    layout="centered",
+    initial_sidebar_state="auto",
+)
+
 if "user" not in st.session_state:
     st.session_state["user"] = None
 if "page" not in st.session_state:
