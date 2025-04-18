@@ -1,8 +1,9 @@
 import streamlit as st
 import requests
 from io import BytesIO
+import streamlit.components.v1 as components
 
-API_URL = "http://localhost:8000"
+API_URL = "https://fr-cardiovascular-suppose-diane.trycloudflare.com"
 
 st.set_page_config(page_title="EchoMe", page_icon="🎤", layout="centered")
 
@@ -79,8 +80,10 @@ elif st.session_state["page"] == "Dashboard":
                     st.error("Upload failed.")
 
         elif func == "Record Voice":
-            import streamlit.components.v1 as components
             st.subheader("🎙️ Record Your Voice")
+            st.info("Please ensure you're in a quiet environment and speak clearly. EchoMe will use this audio to build a voice clone.")
+            st.markdown("**Please read this aloud while recording:**")
+            st.write("> “This is my voice for EchoMe. I am speaking clearly and naturally so the app can learn how I sound.”")
             voice_name = st.text_input("Voice Name", value="Recorded Voice")
 
             if voice_name.strip():
@@ -90,10 +93,12 @@ elif st.session_state["page"] == "Dashboard":
                         <audio id="player" controls style="width:80%; margin-bottom:10px;"></audio><br>
                         <button onclick="startRecording()" style="padding:10px 20px; margin-right:10px; border:none; background:#0073e6; color:white; border-radius:5px;">Start Recording</button>
                         <button onclick="stopRecording()" style="padding:10px 20px; border:none; background:#e60000; color:white; border-radius:5px;">Stop & Upload</button>
+                        <p id="ios_warning_text" style="color:orange; font-weight:bold; margin-top:10px; display:none;"></p>
                     </div>
                     <script>
                         let mediaRecorder;
                         let audioChunks = [];
+                        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
                         async function startRecording() {{
                             try {{
@@ -124,6 +129,10 @@ elif st.session_state["page"] == "Dashboard":
                                     }}).then(response => {{
                                         if (response.ok) {{
                                             alert("✅ Recording uploaded successfully!");
+                                            if (isIOS) {{
+                                                document.getElementById("ios_warning_text").style.display = "block";
+                                                document.getElementById("ios_warning_text").innerText = "⚠️ You won't be able to hear your recording on iOS due to Safari limitations.";
+                                            }}
                                         }} else {{
                                             alert("❌ Upload failed.");
                                         }}
@@ -140,7 +149,7 @@ elif st.session_state["page"] == "Dashboard":
                             }}
                         }}
                     </script>
-                """, height=370)
+                """, height=410)
             else:
                 st.warning("Please enter a voice name before recording.")
 
