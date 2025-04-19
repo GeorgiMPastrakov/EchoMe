@@ -1,0 +1,4 @@
+[submodule "openvoice"]
+	path = openvoice
+	url = https://github.com/camenduru/OpenVoice
+	branch = dev
