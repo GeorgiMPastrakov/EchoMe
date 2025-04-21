@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from gradio_client import Client
-import shutil, os, base64
+import shutil, os, base64, uuid
 from db import engine, SessionLocal, Base
 import models, schemas
 
@@ -48,7 +48,8 @@ async def upload_audio(
     audio_file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
-    file_path = os.path.join(UPLOAD_DIR, audio_file.filename)
+    unique_filename = f"{uuid.uuid4()}.wav"
+    file_path = os.path.join(UPLOAD_DIR, unique_filename)
     with open(file_path, "wb") as buf:
         shutil.copyfileobj(audio_file.file, buf)
     voice = models.Voice(user_id=user_id, voice_name=voice_name, audio_file=file_path, embedding_file="")
@@ -69,11 +70,12 @@ def generate_audio(
     style: str = Body(...),
     db: Session = Depends(get_db),
 ):
-    voice = db.query(models.Voice).get(voice_id)
+    voice = db.get(models.Voice, voice_id)
     if not voice:
         raise HTTPException(404, "Voice not found")
 
     local_wav = voice.audio_file
+
     client = Client("https://myshell-ai-openvoice.hf.space/--replicas/pe0v7/")
 
     try:

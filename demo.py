@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-"""
-Demo script for calling the OpenVoice Gradio API via gradio_client.
-"""
+
 
 import argparse
 import os
