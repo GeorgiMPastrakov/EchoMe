@@ -1,9 +1,8 @@
 import streamlit as st
 import requests
-from io import BytesIO
 import streamlit.components.v1 as components
 
-API_URL = "https://fr-cardiovascular-suppose-diane.trycloudflare.com"
+API_URL = "http://localhost:8000"
 
 st.set_page_config(page_title="EchoMe", page_icon="🎤", layout="centered")
 
