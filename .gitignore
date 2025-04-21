@@ -19,3 +19,4 @@ uploads/
 *.pem
 *.log
 *.sqlite3
+venv311/
