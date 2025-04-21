@@ -123,7 +123,8 @@ elif st.session_state["page"] == "Dashboard":
                             const formData = new FormData();
                             formData.append("user_id", "{user['id']}");
                             formData.append("voice_name", "{voice_name}");
-                            formData.append("audio_file", audioBlob, "recorded.wav");
+                            const filename = "recorded_" + Date.now() + ".wav";
+                            formData.append("audio_file", audioBlob, filename);
 
                             fetch("{API_URL}/upload_audio", {{
                                 method: "POST",
