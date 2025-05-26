@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · EchoMe{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex gap-2">
+  <button data-tab="profile"   class="tabBtn px-3 py-2 rounded border-b-2 border-transparent">Profile</button>
+  <button data-tab="add-voice" class="tabBtn px-3 py-2 rounded border-b-2 border-transparent">Add Voice</button>
+  <button data-tab="generate"  class="tabBtn px-3 py-2 rounded border-b-2 border-transparent">Generate Speech</button>
+</div>
+
+<section id="profileTab"   hidden class="space-y-4"></section>
+<section id="addVoiceTab" hidden class="space-y-4"></section>
+<section id="generateTab" hidden class="space-y-4"></section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}
