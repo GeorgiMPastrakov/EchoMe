@@ -4,9 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>EchoMe · Home</title>
-
   <script src="https://cdn.tailwindcss.com"></script>
-
   <script>
     const pref = localStorage.getItem('theme');
     if (pref === 'dark' || (!pref && matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -14,40 +12,32 @@
     }
   </script>
 </head>
-<body class="min-h-screen bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 flex flex-col">
-
-  <header class="w-full shadow-sm bg-white/80 dark:bg-gray-800/60 backdrop-blur sticky top-0 z-10">
-    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="index.html" class="font-semibold text-xl">EchoMe</a>
-      <button id="themeToggle" class="text-sm px-2 py-1 rounded border dark:border-gray-600">
-        <span class="hidden dark:inline">🌞 Light</span>
-        <span class="dark:hidden">🌙 Dark</span>
+<body class="min-h-screen flex flex-col bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 ease-in-out">
+  <header class="w-full sticky top-0 backdrop-blur bg-white/70 dark:bg-gray-800/60 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="text-2xl font-bold tracking-tight">EchoMe</a>
+      <button id="themeToggle" aria-label="Toggle theme" class="p-2 rounded border dark:border-gray-600 transition-all duration-300 hover:rotate-12 hover:scale-110">
+        <span id="iconSun" class="hidden">🌞</span>
+        <span id="iconMoon">🌙</span>
       </button>
     </div>
   </header>
 
-  <main class="flex-1 max-w-4xl mx-auto p-6 text-center space-y-6">
-    <h1 class="text-4xl font-bold">Clone any voice in seconds.</h1>
-    <p class="text-lg text-gray-600 dark:text-gray-300">
+  <main class="flex-1 flex flex-col items-center justify-center text-center px-6 space-y-8">
+    <h1 class="text-5xl sm:text-6xl font-extrabold leading-tight bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent motion-safe:animate-fade-in">
+      Clone any voice in seconds
+    </h1>
+    <p class="max-w-xl text-lg text-gray-600 dark:text-gray-300">
       Sign up to start creating personalised speech with EchoMe.
     </p>
-    <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-      <a href="signup.html" class="px-6 py-3 rounded bg-indigo-600 text-white shadow hover:bg-indigo-700">
-        Sign&nbsp;Up
-      </a>
-      <a href="login.html" class="px-6 py-3 rounded border border-gray-400 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">
+    <div class="flex flex-col sm:flex-row gap-4 pt-4">
+      <a href="signup.html" class="px-8 py-3 rounded-lg bg-indigo-600 text-white font-medium shadow-lg hover:bg-indigo-700 hover:-translate-y-0.5 transition-all duration-300">Sign&nbsp;Up</a>
+      <a href="login.html" class="px-8 py-3 rounded-lg border border-gray-400 dark:border-gray-500 font-medium shadow hover:bg-gray-100 dark:hover:bg-gray-800 hover:-translate-y-0.5 transition-all duration-300">
         Log&nbsp;In
       </a>
     </div>
   </main>
 
-  <script src="js/auth.js"></script>
-  <script>
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      const html = document.documentElement;
-      html.classList.toggle('dark');
-      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-    });
-  </script>
+  <script src="js/theme.js"></script>
 </body>
 </html>

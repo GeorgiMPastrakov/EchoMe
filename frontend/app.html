@@ -6,25 +6,24 @@
   <title>Dashboard · EchoMe</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 flex flex-col">
-
-  <header class="w-full shadow-sm bg-white/80 dark:bg-gray-800/60 backdrop-blur">
-    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-      <span class="font-semibold text-xl">EchoMe</span>
-      <a id="logoutBtn" href="#" class="text-sm underline">Log out</a>
+<body class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300 ease-in-out">
+  <header class="w-full sticky top-0 backdrop-blur bg-white/70 dark:bg-gray-800/60 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <span class="text-2xl font-bold">EchoMe</span>
+      <a id="logoutBtn" href="#" class="underline text-sm hover:text-indigo-600">Log out</a>
     </div>
   </header>
 
-  <main class="flex-1 max-w-4xl mx-auto p-6">
+  <main class="flex-1 max-w-5xl mx-auto p-6">
     <div class="mb-6 flex gap-2">
-      <button data-tab="profile"   class="tabBtn px-3 py-2 rounded border-b-2 border-transparent">Profile</button>
-      <button data-tab="add-voice" class="tabBtn px-3 py-2 rounded border-b-2 border-transparent">Add Voice</button>
-      <button data-tab="generate"  class="tabBtn px-3 py-2 rounded border-b-2 border-transparent">Generate Speech</button>
+      <button data-tab="profile"   class="tabBtn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-sm font-medium transition">Profile</button>
+      <button data-tab="add-voice" class="tabBtn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-sm font-medium transition">Add Voice</button>
+      <button data-tab="generate"  class="tabBtn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-sm font-medium transition">Generate Speech</button>
     </div>
 
-    <section id="profileTab"   hidden class="space-y-4"></section>
-    <section id="addVoiceTab" hidden class="space-y-4"></section>
-    <section id="generateTab" hidden class="space-y-4"></section>
+    <section id="profileTab"   hidden class="space-y-4 motion-safe:animate-fade-in"></section>
+    <section id="addVoiceTab" hidden class="space-y-4 motion-safe:animate-fade-in"></section>
+    <section id="generateTab" hidden class="space-y-4 motion-safe:animate-fade-in"></section>
   </main>
 
   <script src="js/auth.js"></script>
