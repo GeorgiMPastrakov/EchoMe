@@ -1,43 +1,53 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="bg-white text-black dark:bg-gray-900 dark:text-white">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EchoMe · Home</title>
+  <title>EchoMe – Login / Sign-Up</title>
+
+  <!-- Tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    const pref = localStorage.getItem('theme');
-    if (pref === 'dark' || (!pref && matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark');
-    }
-  </script>
+
+  <!-- Favicon / logo -->
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+
+  <!-- Theme + auth scripts -->
+  <script src="assets/theme.js" defer></script>
+  <script src="assets/auth.js"  defer></script>
 </head>
-<body class="min-h-screen flex flex-col bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 ease-in-out">
-  <header class="w-full sticky top-0 backdrop-blur bg-white/70 dark:bg-gray-800/60 shadow-sm">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="index.html" class="text-2xl font-bold tracking-tight">EchoMe</a>
-      <button id="themeToggle" aria-label="Toggle theme" class="p-2 rounded border dark:border-gray-600 transition-all duration-300 hover:rotate-12 hover:scale-110">
-        <span id="iconSun" class="hidden">🌞</span>
-        <span id="iconMoon">🌙</span>
+<body class="min-h-screen flex flex-col items-center justify-center">
+
+  <img src="assets/logo.png" alt="EchoMe Logo" class="h-16 w-16 mb-4" />
+  <h1 class="text-3xl font-bold mb-6">EchoMe</h1>
+
+  <div class="w-full max-w-sm">
+    <!-- ── Sign-Up ───────────────────────────── -->
+    <form id="signupForm" class="mb-8 p-4 border rounded shadow dark:border-gray-700">
+      <h2 class="text-xl font-semibold mb-4">Sign Up</h2>
+
+      <input name="email"    type="email"    placeholder="Email"
+             class="w-full mb-3 p-2 rounded border dark:bg-gray-800"  required />
+      <input name="password" type="password" placeholder="Password"
+             class="w-full mb-3 p-2 rounded border dark:bg-gray-800"  required />
+
+      <button type="submit" class="w-full py-2 bg-blue-600 text-white rounded">
+        Sign Up
       </button>
-    </div>
-  </header>
+    </form>
 
-  <main class="flex-1 flex flex-col items-center justify-center text-center px-6 space-y-8">
-    <h1 class="text-5xl sm:text-6xl font-extrabold leading-tight bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent motion-safe:animate-fade-in">
-      Clone any voice in seconds
-    </h1>
-    <p class="max-w-xl text-lg text-gray-600 dark:text-gray-300">
-      Sign up to start creating personalised speech with EchoMe.
-    </p>
-    <div class="flex flex-col sm:flex-row gap-4 pt-4">
-      <a href="signup.html" class="px-8 py-3 rounded-lg bg-indigo-600 text-white font-medium shadow-lg hover:bg-indigo-700 hover:-translate-y-0.5 transition-all duration-300">Sign&nbsp;Up</a>
-      <a href="login.html" class="px-8 py-3 rounded-lg border border-gray-400 dark:border-gray-500 font-medium shadow hover:bg-gray-100 dark:hover:bg-gray-800 hover:-translate-y-0.5 transition-all duration-300">
-        Log&nbsp;In
-      </a>
-    </div>
-  </main>
+    <!-- ── Log-In ────────────────────────────── -->
+    <form id="loginForm"  class="p-4 border rounded shadow dark:border-gray-700">
+      <h2 class="text-xl font-semibold mb-4">Log In</h2>
 
-  <script src="js/theme.js"></script>
+      <input name="email"    type="email"    placeholder="Email"
+             class="w-full mb-3 p-2 rounded border dark:bg-gray-800"  required />
+      <input name="password" type="password" placeholder="Password"
+             class="w-full mb-3 p-2 rounded border dark:bg-gray-800"  required />
+
+      <button type="submit" class="w-full py-2 bg-green-600 text-white rounded">
+        Log In
+      </button>
+    </form>
+  </div>
 </body>
 </html>

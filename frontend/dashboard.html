@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-white text-black dark:bg-gray-900 dark:text-white">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard – EchoMe</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+
+  <script src="assets/theme.js"  defer></script>
+  <script src="assets/record.js" defer></script>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Navbar -->
+  <header class="p-4 flex justify-between items-center border-b dark:border-gray-700">
+    <div class="flex items-center">
+      <img src="assets/logo.png" alt="" class="h-8 w-8 mr-2" />
+      <span class="text-2xl font-bold">EchoMe</span>
+    </div>
+    <button id="themeToggle"
+            class="px-4 py-2 rounded bg-gray-200 dark:bg-gray-800 dark:text-white">
+      Toggle Theme
+    </button>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 flex flex-col items-center justify-center p-6">
+    <div class="grid gap-6 grid-cols-1 md:grid-cols-3">
+      <!-- Record -->
+      <section class="p-6 border rounded shadow dark:border-gray-600 text-center">
+        <h3 class="text-lg font-semibold mb-4">Record voice</h3>
+        <input id="recordLabel" type="text" placeholder="Voice label"
+               class="w-full mb-3 p-2 rounded border dark:bg-gray-800" />
+        <button id="recordBtn" class="px-4 py-2 bg-blue-600 text-white rounded mr-2">
+          Start
+        </button>
+        <button id="stopBtn"   class="px-4 py-2 bg-red-600  text-white rounded"
+                disabled>
+          Stop
+        </button>
+      </section>
+
+      <!-- Upload -->
+      <section class="p-6 border rounded shadow dark:border-gray-600 text-center">
+        <h3 class="text-lg font-semibold mb-4">Upload sample</h3>
+        <form id="uploadForm">
+          <input name="label" type="text" placeholder="Voice label" required
+                 class="w-full mb-3 p-2 rounded border dark:bg-gray-800" />
+          <input name="file" type="file" accept="audio/*" required
+                 class="w-full mb-3 p-2 dark:bg-gray-800" />
+          <button class="px-4 py-2 bg-blue-600 text-white rounded">
+            Upload
+          </button>
+        </form>
+      </section>
+
+      <!-- Generate -->
+      <section class="p-6 border rounded shadow dark:border-gray-600 text-center">
+        <h3 class="text-lg font-semibold mb-4">Generate (XTTS)</h3>
+        <form id="generateForm">
+          <select name="voice_id"
+                  class="w-full mb-3 p-2 rounded border dark:bg-gray-800">
+          </select>
+          <textarea name="text" rows="3" placeholder="Enter text…"
+                    class="w-full mb-3 p-2 rounded border dark:bg-gray-800"></textarea>
+          <button class="px-4 py-2 bg-green-600 text-white rounded">
+            Generate
+          </button>
+        </form>
+        <audio id="generatedAudio" controls class="mt-4 w-full hidden"></audio>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // ── populate dropdown with user's voices ────────────────────────────
+    async function loadVoices() {
+      const res = await fetch("/api/voices", {
+        headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+      });
+      if (!res.ok) return;
+      const voices = await res.json();
+      const sel = document.querySelector("#generateForm select[name='voice_id']");
+      voices.forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = v.id ?? v.filename;
+        opt.textContent = v.label;
+        sel.appendChild(opt);
+      });
+    }
+    loadVoices();
+
+    // ── handle upload ──────────────────────────────────────────────────
+    document.getElementById("uploadForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const res = await fetch("/api/voices/upload", {
+        method : "POST",
+        body   : formData,
+        headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+      });
+      alert(res.ok ? "Uploaded!" : "Upload failed");
+    });
+
+    // ── handle generate ────────────────────────────────────────────────
+    document.getElementById("generateForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const body = Object.fromEntries(new FormData(e.target));
+      const res  = await fetch("/api/generate", {
+        method : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization : "Bearer " + localStorage.getItem("token")
+        },
+        body   : JSON.stringify(body)
+      });
+      if (res.ok) {
+        const { audio_url } = await res.json();
+        const player = document.getElementById("generatedAudio");
+        player.src   = audio_url;
+        player.classList.remove("hidden");
+        player.play();
+      } else alert("Generation failed");
+    });
+  </script>
+</body>
+</html>
