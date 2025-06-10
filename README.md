@@ -1,28 +1,40 @@
-# 🎤 EchoMe — Real-Time Voice Cloning Web App
+# EchoMe
 
-EchoMe is a real-time voice cloning web app that lets users upload or record their voice, type a message, and generate speech that sounds just like them. Designed for accessibility, emotional connection, and digital creativity, EchoMe brings your voice into the digital world.
+A lightweight **voice-cloning + text-to-speech** web app  
+*Streamlit front-end · FastAPI back-end · Coquí-TTS XTTS v2 engine*
 
-## 🌟 Features
+---
 
-- 🔊 Upload or record your voice
-- 💬 Type any text to generate AI speech in your voice
-- 🎭 Choose from emotional styles: cheerful, whispering, sad, etc.
-- 👁️‍🗨️ Great for blind users — they can hear who is "speaking"
-- 📖 Read bedtime stories using your own voice, even remotely
-- 🧠 Built with FastAPI, Streamlit, and OpenVoice
+## ✨ Features
 
-## 🛠️ Tech Stack
+| Capability | Notes |
+|------------|-------|
+| **Sign up / Log in** | Stored in MySQL (`users` table) |
+| **Upload or record a reference voice** | Any format accepted; server auto-converts to 16 kHz 16-bit mono WAV |
+| **Clone + speak** | Multilingual XTTS v2 runs locally (CPU or CUDA) |
+| **Browser playback** | Generated WAV returned as a Base-64 data URI |
+| **REST API** | `/signup`, `/login`, `/upload_audio`, `/voices`, `/generate_audio` |
 
-- **Frontend:** Streamlit
-- **Backend:** FastAPI + SQLAlchemy + MySQL
-- **Voice Cloning:** OpenVoice (via Hugging Face Spaces) and RTVC (optional)
-- **Authentication:** Custom user system with login/signup
-- **Hosting:** Cloudflare Tunnel / Render / local
+---
 
-## 🚀 Setup Instructions
+## 1  Prerequisites
 
-### 1. Clone the repository
+| Component | Tested version |
+|-----------|----------------|
+| Python 3.11 | |
+| MySQL 8.x   | Database **echome**, user **echo_user** |
+| FFmpeg      | For audio conversion |
+| (optional) NVIDIA GPU | CUDA 12.1 driver |
+
+---
+
+## 2  Clone & create a venv
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/EchoMe.git
-cd EchoMe
+git clone https://github.com/your-user/echo-me.git
+cd echo-me
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# macOS/Linux
+source venv/bin/activate

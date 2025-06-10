@@ -1,4 +1,3 @@
-# frontend/app.py  –  streamlined UI with page banners & nav buttons
 import streamlit as st
 import requests, io, base64
 import streamlit.components.v1 as components
@@ -7,7 +6,6 @@ API_URL = "http://localhost:8000"
 
 st.set_page_config(page_title="EchoMe", page_icon="🎤", layout="centered")
 
-# ── simple CSS for buttons & headings ───────────────────────────────
 st.markdown(
     """
     <style>
@@ -23,12 +21,10 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ── session keys ────────────────────────────────────────────────────
 state = st.session_state
 state.setdefault("user", None)
 state.setdefault("page", "Home")
 
-# ── global nav / logout (top-right) ─────────────────────────────────
 col_nav1, col_nav2, col_nav3 = st.columns([1, 1, 6])
 with col_nav3:
     if state.get("user"):
@@ -40,9 +36,6 @@ with col_nav3:
     else:
         st.markdown("&nbsp;", unsafe_allow_html=True)
 
-# -------------------------------------------------------------------
-#  HOME  ─────────────────────────────────────────────────────────────
-# -------------------------------------------------------------------
 if state["page"] == "Home":
     st.markdown("<div class='echo-banner'>🏠 EchoMe Home</div>", unsafe_allow_html=True)
 
@@ -56,9 +49,6 @@ if state["page"] == "Home":
             state["page"] = "Sign Up"
             st.rerun()
 
-# -------------------------------------------------------------------
-#  SIGN-UP  ──────────────────────────────────────────────────────────
-# -------------------------------------------------------------------
 elif state["page"] == "Sign Up":
     st.markdown("<div class='echo-banner'>📝 Sign Up</div>", unsafe_allow_html=True)
 
@@ -79,9 +69,6 @@ elif state["page"] == "Sign Up":
 
     st.button("⬅ Back to Home", on_click=lambda: state.update(page="Home"))
 
-# -------------------------------------------------------------------
-#  LOGIN  ────────────────────────────────────────────────────────────
-# -------------------------------------------------------------------
 elif state["page"] == "Log In":
     st.markdown("<div class='echo-banner'>🔐 Log In</div>", unsafe_allow_html=True)
 
@@ -102,9 +89,6 @@ elif state["page"] == "Log In":
 
     st.button("⬅ Back to Home", on_click=lambda: state.update(page="Home"))
 
-# -------------------------------------------------------------------
-#  DASHBOARD  ────────────────────────────────────────────────────────
-# -------------------------------------------------------------------
 elif state["page"] == "Dashboard":
     user = state.get("user")
     if not user:
@@ -121,7 +105,6 @@ elif state["page"] == "Dashboard":
     )
     st.divider()
 
-    # ── Upload Voice ───────────────────────────────────────────────
     if func == "Upload Voice":
         voice_name = st.text_input("Voice name", value="My Voice")
         file = st.file_uploader("Upload a WAV file", type=["wav"])
@@ -132,7 +115,6 @@ elif state["page"] == "Dashboard":
             if r.status_code == 200:
                 st.success("Voice uploaded!")
 
-    # ── Record Voice ───────────────────────────────────────────────
     elif func == "Record Voice":
         voice_name = st.text_input("Voice name", value="Recorded")
         st.markdown("#### 🎙️ Recording instructions")
@@ -174,7 +156,6 @@ elif state["page"] == "Dashboard":
             height=350,
         )
 
-    # ── Generate AI Voice ──────────────────────────────────────────
     elif func == "Generate AI Voice":
         r = requests.get(f"{API_URL}/voices", params={"user_id": user["id"]})
         if r.status_code != 200:
@@ -189,7 +170,7 @@ elif state["page"] == "Dashboard":
                 text = st.text_area("Text to synthesize", height=150)
 
                 if st.button("Generate", key="generate_btn") and text:
-                    payload = {"voice_id": vid, "text": text}   # no style
+                    payload = {"voice_id": vid, "text": text}
                     res = requests.post(f"{API_URL}/generate_audio", json=payload)
                     if res.status_code == 200:
                         uri = res.json().get("audio", "")
@@ -207,6 +188,5 @@ elif state["page"] == "Dashboard":
                             detail = f"{res.status_code} {res.reason}"
                         st.error(detail)
 
-    # footer nav
     st.divider()
     st.button("⬅ Log Out & Return Home", on_click=lambda: state.update(page="Home", user=None))
