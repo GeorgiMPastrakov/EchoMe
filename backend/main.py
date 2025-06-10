@@ -67,42 +67,55 @@ def get_voices(user_id: int, db: Session = Depends(get_db)):
 def generate_audio(
     voice_id: int = Body(...),
     text: str = Body(...),
-    style: str = Body(...),
+    style: str | None = Body(None),
     db: Session = Depends(get_db),
 ):
+    # 1) fetch reference voice
     voice = db.get(models.Voice, voice_id)
     if not voice:
         raise HTTPException(404, "Voice not found")
 
-    local_wav = voice.audio_file
+    reference_wav = os.path.abspath(voice.audio_file)
 
-    client = Client("https://myshell-ai-openvoice.hf.space/--replicas/pe0v7/")
+    # 2) optional style tag at the front of the prompt
+    if style and style.lower() != "default":
+        text = f"[{style}] {text}"
+
+    # 3) call the root Space URL (replica slug changes on every restart)
+    client = Client(os.getenv("XTTS_SPACE_URL", "https://coqui-xtts.hf.space/"))
 
     try:
+        # Space’s main fn (fn_index=0) returns 4 items; item 1 = WAV path
         result = client.predict(
-            text,
-            f"{style}",
-            local_wav,
-            True,
-            fn_index=1
+            text,            # prompt
+            "en",            # language code
+            reference_wav,   # reference voice
+            None,            # microphone wav (none)
+            False,           # use_mic
+            False,           # voice_cleanup
+            True,            # no_lang_auto_detect
+            True,            # agree to T&C
+            fn_index=0
         )
-        print("OpenVoice response:", result)
     except Exception as e:
         raise HTTPException(502, f"TTS service error: {e}")
 
-    if not isinstance(result, (list, tuple)) or len(result) != 3:
+    if not isinstance(result, (list, tuple)) or len(result) < 2:
         raise HTTPException(502, "Unexpected TTS response format")
 
-    _, audio_output_path, _ = result
-
-    if not os.path.exists(audio_output_path):
+    wav_path = result[1]
+    if not os.path.exists(wav_path):
         raise HTTPException(500, "Generated audio file not found")
 
+    # 4) read → base64 → data-URI
+    with open(wav_path, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode("utf-8")
+        audio_uri = f"data:audio/wav;base64,{encoded}"
+
+    # tidy up temp file (optional)
     try:
-        with open(audio_output_path, "rb") as f:
-            audio_bytes = f.read()
-            encoded = base64.b64encode(audio_bytes).decode("utf-8")
-            audio_data_uri = f"data:audio/wav;base64,{encoded}"
-            return JSONResponse(content={"audio": audio_data_uri})
-    except Exception as e:
-        raise HTTPException(500, f"Failed to read or encode audio: {e}")
+        os.remove(wav_path)
+    except OSError:
+        pass
+
+    return JSONResponse(content={"audio": audio_uri})
