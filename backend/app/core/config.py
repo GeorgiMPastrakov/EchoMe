@@ -10,19 +10,16 @@ class Settings(BaseSettings):
     postgres_password: str
     postgres_db: str
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-
     @property
-    def db_uri(self) -> str:
+    def db_uri(self):
         return (
-            "postgresql+asyncpg://"
-            f"{self.postgres_user}:{self.postgres_password}"
+            f"postgresql://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
 
+    class Config:
+        env_file = ".env"
 
-@lru_cache
-def get_settings() -> Settings:
+
+def get_settings():
     return Settings()
