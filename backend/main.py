@@ -1,8 +1,4 @@
-# main.py  – Backend API for EchoMe  (local XTTS v2)
-
-from fastapi import (
-    FastAPI, HTTPException, Depends, UploadFile, File, Form
-)
+from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -10,21 +6,17 @@ from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from pydantic import BaseModel
 import shutil, os, base64, uuid
-
-# ── NEW: local TTS engine ───────────────────────────────────────────
 import torch, soundfile as sf
-from TTS.api import TTS                     # pip install "TTS>=0.22" torch soundfile
-# --------------------------------------------------------------------
+from TTS.api import TTS
 
 from db import engine, SessionLocal, Base
 import models, schemas
 
-# ── app setup ───────────────────────────────────────────────────────
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],      # relaxed for local dev
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -37,11 +29,9 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 Base.metadata.create_all(bind=engine)
 
-# ── GLOBAL XTTS MODEL (loads once) ──────────────────────────────────
 device = "cuda" if torch.cuda.is_available() else "cpu"
 tts_engine = TTS("tts_models/multilingual/multi-dataset/xtts_v2").to(device)
 
-# ── DB dependency ───────────────────────────────────────────────────
 def get_db():
     db = SessionLocal()
     try:
@@ -49,7 +39,6 @@ def get_db():
     finally:
         db.close()
 
-# ── AUTH ────────────────────────────────────────────────────────────
 @app.post("/signup", response_model=schemas.UserResponse)
 def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if db.query(models.User).filter(models.User.username == user.username).first():
@@ -63,7 +52,6 @@ def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
     return new_user
 
-
 @app.post("/login", response_model=schemas.UserResponse)
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(
@@ -73,7 +61,6 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(400, "Invalid username or password")
     return db_user
 
-# ── UPLOAD VOICE ────────────────────────────────────────────────────
 @app.post("/upload_audio", response_model=schemas.VoiceResponse)
 def upload_audio(
     user_id: int = Form(...),
@@ -90,7 +77,7 @@ def upload_audio(
     voice = models.Voice(
         user_id=user_id,
         voice_name=voice_name,
-        audio_file=f"/uploads/{public_name}",   # stored as public URL
+        audio_file=f"/uploads/{public_name}",
         embedding_file="",
     )
     db.add(voice)
@@ -98,19 +85,16 @@ def upload_audio(
     db.refresh(voice)
     return voice
 
-# ── LIST VOICES ─────────────────────────────────────────────────────
 @app.get("/voices", response_model=list[schemas.VoiceResponse])
 def get_voices(user_id: int, db: Session = Depends(get_db)):
     return db.query(models.Voice).filter(
         models.Voice.user_id == user_id
     ).all()
 
-# ── GENERATE AUDIO (LOCAL XTTS) ─────────────────────────────────────
 class GenReq(BaseModel):
     voice_id: int
     text: str
     style: str | None = None
-
 
 @app.post("/generate_audio")
 def generate_audio(req: GenReq, db: Session = Depends(get_db)):
@@ -118,7 +102,6 @@ def generate_audio(req: GenReq, db: Session = Depends(get_db)):
     if not voice:
         raise HTTPException(404, "Voice not found")
 
-    # Convert “/uploads/<uuid>.wav” to actual disk path
     if voice.audio_file.startswith("/uploads/"):
         filename = voice.audio_file.split("/uploads/")[-1]
         ref_path = os.path.join(UPLOAD_DIR, filename)
@@ -128,14 +111,12 @@ def generate_audio(req: GenReq, db: Session = Depends(get_db)):
     if not os.path.exists(ref_path):
         raise HTTPException(500, "Reference WAV missing on disk")
 
-    # Prepend style tag if selected
     spoken_text = (
         f"[{req.style}] {req.text}"
         if req.style and req.style.lower() != "default"
         else req.text
     )
 
-    # Synthesize locally
     wav = tts_engine.tts(
         text=spoken_text,
         speaker_wav=ref_path,
@@ -145,7 +126,6 @@ def generate_audio(req: GenReq, db: Session = Depends(get_db)):
     out_file = os.path.join(UPLOAD_DIR, f"{uuid.uuid4()}.wav")
     sf.write(out_file, wav, samplerate=tts_engine.synthesizer.output_sample_rate)
 
-    # Encode to base-64 data URI
     with open(out_file, "rb") as f:
         b64 = base64.b64encode(f.read()).decode("utf-8")
     os.remove(out_file)
